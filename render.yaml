@@ -1,0 +1,24 @@
+# Render Blueprint — same setup as BiodataKaro (free plan, Singapore, Node 20.19.2). Not deployed yet.
+services:
+  - type: web
+    name: photosizekaro
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start # next start binds to $PORT provided by Render
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 20.19.2
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false # e.g. https://photosizekaro.com (baked in at build time → redeploy after changing)
+      - key: UNLOCK_TOKEN_SECRET
+        generateValue: true
+      # Add when ready: RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET,
+      # NEXT_PUBLIC_OWNER_NAME, NEXT_PUBLIC_CONTACT_EMAIL, NEXT_PUBLIC_CONTACT_PHONE, NEXT_PUBLIC_CONTACT_ADDRESS, NEXT_PUBLIC_OWNER_CITY
+      # Without Razorpay keys the site shows "Payments launching soon" (free tools work fully).
+      # NEVER set ALLOW_MOCK_PAYMENTS on a public deployment.
