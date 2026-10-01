@@ -234,7 +234,7 @@ export function DocTool({ spec, fileName, examName }: { spec: ToolSpec; fileName
             <div className="flex min-h-40 items-center justify-center rounded-xl border border-slate-200 bg-[repeating-conic-gradient(#f1f5f9_0_25%,#fff_0_50%)] bg-[length:16px_16px] p-3">
               {result ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={result.url} alt={`${spec.label} output preview`} width={result.width} height={result.height} className="h-auto max-h-72 max-w-full border border-slate-300 bg-white object-contain [image-rendering:auto]" style={{ width: Math.min(result.width * (result.width < 300 ? 1.5 : 1), 320) }} />
+                <img src={result.url} alt={`${spec.label} output preview`} width={result.width} height={result.height} className="h-auto max-w-full border border-slate-300 bg-white [image-rendering:auto]" style={{ width: Math.round(result.width * Math.min(320 / result.width, 288 / result.height, result.width < 300 ? 1.5 : 1)) }} />
               ) : (
                 <span className="text-[13px] text-slate-500">{busy ? "Processing…" : "Adjust the crop to see your file"}</span>
               )}

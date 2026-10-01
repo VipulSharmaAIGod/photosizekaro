@@ -875,5 +875,5 @@ export function kbText(d: DocSpec) {
 }
 
 export function statusLabel(s: Status) {
-  return s === "verified" ? "Verified from official notice" : s === "partial" ? "From official common guidelines" : "Unverified";
+  return s === "verified" ? "Verified from official notice" : s === "partial" ? "Partly verified (shared portal rules / notice copy)" : "Unverified";
 }
