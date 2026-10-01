@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { track } from "@/lib/analytics/client";
+import { useEffect, useState } from "react";
 import { GROUPS, isResizable, PRESETS, type DocKind } from "@/data/presets";
 import { setJpegDpi } from "@/lib/image/jpeg";
 import { jpegToPdf } from "@/lib/image/pdf";
@@ -26,6 +27,9 @@ const toJpeg = (c: HTMLCanvasElement, q = 0.92) => new Promise<Uint8Array>((res)
 
 export function KitTool() {
   const unlock = useUnlock();
+  useEffect(() => {
+    track("kit_view");
+  }, []);
   const [masters, setMasters] = useState<Partial<Record<DocKind, Master>>>({});
   const [selected, setSelected] = useState<string[]>(["ssc-cgl", "ibps-po", "sbi-po", "rrb-ntpc", "neet-ug", "ctet"]);
   const [whiten, setWhiten] = useState(true);
@@ -215,7 +219,7 @@ export function KitTool() {
         )}
         {zip &&
           (unlock ? (
-            <a href={zip.url} download="exam-kit.zip" data-testid="kit-zip" className="mt-3 flex min-h-12 items-center justify-center rounded-xl bg-emerald-600 px-5 text-[16px] font-bold text-white shadow">
+            <a href={zip.url} download="exam-kit.zip" onClick={() => track("download", { exam: "kit", doc: "zip", kind: "kit", n: items.length })} data-testid="kit-zip" className="mt-3 flex min-h-12 items-center justify-center rounded-xl bg-emerald-600 px-5 text-[16px] font-bold text-white shadow">
               ⬇ Download exam-kit.zip ({(zip.size / 1024).toFixed(0)} KB)
             </a>
           ) : (
@@ -246,7 +250,7 @@ export function KitTool() {
             <img src={sheet.preview} alt="Photo sheet preview" className="w-full rounded-lg border border-slate-200 shadow" data-testid="sheet-preview" />
             <div>
               {sheet.file ? (
-                <a href={sheet.file.url} download={sheet.file.name} data-testid="sheet-download" className="flex min-h-12 items-center justify-center rounded-xl bg-emerald-600 px-5 text-[16px] font-bold text-white shadow">
+                <a href={sheet.file.url} download={sheet.file.name} onClick={() => track("download", { exam: "kit", doc: "sheet", kind: "sheet", layout })} data-testid="sheet-download" className="flex min-h-12 items-center justify-center rounded-xl bg-emerald-600 px-5 text-[16px] font-bold text-white shadow">
                   ⬇ {sheet.file.name} ({(sheet.file.size / 1024).toFixed(0)} KB)
                 </a>
               ) : (

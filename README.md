@@ -58,3 +58,17 @@ Outputs go to `test-output/`, screenshots to `screenshots/`.
    `RAZORPAY_WEBHOOK_SECRET` + webhook URL. Never set `ALLOW_MOCK_PAYMENTS` on Render.
 5. Google Search Console: verify domain, submit `/sitemap.xml`. Apply for AdSense once there is traffic.
 6. Re-verify presets each notification cycle (`lastVerified` + `sources[].ref` say where to look).
+
+## Analytics (privacy-friendly, no third party)
+
+- **How it works:** the browser sends a small beacon to `POST /api/t`, and server routes log their own events. Every event becomes **one stdout line**: `ANALYTICS {"v":1,"s":"<site>","e":"<event>","ts":…,"d":"<IST date>","vid":…,"p":…,"ref":…,"utm":…,"dev":…,"x":{…}}`. Render keeps these app logs for 7 days on the Hobby workspace.
+- **No cookies or stored ids:** nothing is stored on the device, and IP and user agent are never written. `vid` = sha256(daily salt | IP | UA), cut to 16 hex characters. The salt is an HMAC of `ANALYTICS_SALT_SECRET` (falling back to `UNLOCK_TOKEN_SECRET`) and the IST date, so ids rotate every day and visitors are counted uniquely per day.
+- **What's dropped:** bots, crawlers, curl, headless browsers (`navigator.webdriver`), prefetch requests and `/api/health`. On your own phone, open any page with `?notrack=1` to stop counting yourself (`?notrack=0` undoes it). Tests opt in with `?allowbot=1` and are tagged `utm_source=agent_test`; the report excludes them by default.
+- **Event names:** see `src/lib/analytics/events.ts`. Server-side events are `order_created`, `payment_success` (after signature verification, `x.amt` in paise, `x.mode` live/test/mock) and `restore`.
+- **Health endpoint:** `GET /api/health` returns `ok` and logs nothing. The keep-alive pings use it.
+- **Tests:** `npm run test:analytics` needs the local server running with its log file.
+- **Reports:** see `/workspace/analytics/README.md` on the agent box (`report.mjs`, plus the procedure for pulling logs through the Render connector).
+
+### Keep-alive
+
+Cold starts are reduced by the keep-alive workflow in the public **VipulSharmaAIGod/biodatakaro** repo (`.github/workflows/keepalive.yml`). It pings this site's `/api/health` every 10 minutes from 18:00 to 22:00 IST, which fits within Render's shared 750 free hours.

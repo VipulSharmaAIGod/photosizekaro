@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@/lib/analytics/client";
 import { useEffect, useState } from "react";
 import { createOrder, getPayConfig, mockPay, openRazorpay, restorePurchase, storeUnlock, verifyPayment, type OrderResp, type PayConfig, type UnlockResp } from "@/lib/pay-client";
 import { PRICES, rupees } from "@/lib/pricing";
@@ -28,6 +29,7 @@ export function Paywall({ unlock }: { unlock: UnlockResp | null }) {
   const buy = async () => {
     setErr("");
     setBusy(true);
+    track("checkout_open", { sku: "kit" });
     try {
       const o = await createOrder("kit");
       if (o.provider === "mock") {

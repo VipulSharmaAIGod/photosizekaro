@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logServerEvent } from "@/lib/analytics/server";
 import { readBlob } from "@/lib/crypto";
 import { activeProvider, paymentsAvailable } from "@/lib/payments";
 import type { OrderTicket } from "@/lib/payments/types";
@@ -18,5 +19,6 @@ export async function POST(req: Request) {
   const ok = await provider.verifyPayment({ orderId: String(body.orderId), paymentId: String(body.paymentId || ""), signature: String(body.signature || "") });
   if (!ok) return NextResponse.json({ error: "Payment verification failed." }, { status: 400 });
   const { token, payload } = issueUnlockToken({ sku: ticket.sku, pid: String(body.paymentId), mode: provider.mode });
+  logServerEvent(req, "payment_success", { sku: ticket.sku, amt: ticket.amt, mode: provider.mode });
   return NextResponse.json({ token, sku: payload.sku, exp: payload.exp, paymentId: payload.pid });
 }

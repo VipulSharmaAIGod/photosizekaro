@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans, Noto_Sans_Devanagari } from "next/font/google";
 import { BRAND, SITE_URL } from "@/lib/site";
+import { Analytics } from "@/components/Analytics";
 import "./globals.css";
 
 const ui = Noto_Sans({ subsets: ["latin"], variable: "--font-ui", display: "swap" });
@@ -27,7 +28,10 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-IN" className={`${ui.variable} ${deva.variable}`}>
-      <body className="flex min-h-dvh flex-col antialiased">{children}</body>
+      <body className="flex min-h-dvh flex-col antialiased">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

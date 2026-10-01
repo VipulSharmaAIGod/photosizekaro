@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logServerEvent } from "@/lib/analytics/server";
 import { activeProvider, paymentsAvailable } from "@/lib/payments";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { issueUnlockToken } from "@/lib/unlock-token";
@@ -24,5 +25,6 @@ export async function POST(req: Request) {
   }
   if (Date.now() / 1000 - p.createdAt > RESTORE_WINDOW_DAYS * 86400) return NextResponse.json({ error: "This purchase has expired." }, { status: 400 });
   const { token, payload } = issueUnlockToken({ sku: "kit", pid: p.id, mode: provider.mode });
+  logServerEvent(req, "restore", { sku: "kit", amt: p.amountPaise, mode: provider.mode });
   return NextResponse.json({ token, sku: payload.sku, exp: payload.exp, paymentId: p.id });
 }

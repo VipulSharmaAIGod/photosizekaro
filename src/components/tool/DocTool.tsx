@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@/lib/analytics/client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 import type { DocSpec } from "@/data/presets";
@@ -24,7 +25,7 @@ function canvasUrl(c: HTMLCanvasElement): Promise<string> {
   return new Promise((res) => c.toBlob((b) => res(URL.createObjectURL(b!)), "image/jpeg", 0.9));
 }
 
-export function DocTool({ spec, fileName, examName }: { spec: ToolSpec; fileName: string; examName?: string }) {
+export function DocTool({ spec, fileName, examName, examId }: { spec: ToolSpec; fileName: string; examName?: string; examId?: string }) {
   const out: OutSpec = useMemo(() => ({ kind: spec.kind, width: spec.width, height: spec.height, dpi: spec.dpi, minKB: spec.minKB, maxKB: spec.maxKB }), [spec]);
   const [opts, setOpts] = useState<RenderOpts>(() => defaultOpts(spec));
   const [base, setBase] = useState<HTMLCanvasElement | null>(null);
@@ -72,6 +73,7 @@ export function DocTool({ spec, fileName, examName }: { spec: ToolSpec; fileName
       setTurns(0);
       setArea(null);
       setBase(l.canvas);
+      track(spec.kind === "photo" ? "process_photo" : "process_signature", { exam: examId || "custom", doc: spec.id, kind: spec.kind });
     } catch (e) {
       setError((e as Error).message);
     }
@@ -259,6 +261,7 @@ export function DocTool({ spec, fileName, examName }: { spec: ToolSpec; fileName
                 <a
                   href={result.url}
                   download={dl}
+                  onClick={() => track("download", { exam: examId || "custom", doc: spec.id, kind: spec.kind, ok: sizeOk && dimOk && rangeOk, kb: Math.round(result.bytes / 102.4) / 10 })}
                   data-testid={`dl-${spec.id}`}
                   className={`mt-2 flex min-h-12 items-center justify-center rounded-xl px-5 text-[16px] font-bold text-white shadow ${busy ? "pointer-events-none bg-slate-400" : "bg-brand hover:bg-brand-dark"}`}
                 >
@@ -291,3 +294,4 @@ function Check({ ok, text }: { ok: boolean; text: string }) {
     </p>
   );
 }
+

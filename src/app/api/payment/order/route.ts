@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logServerEvent } from "@/lib/analytics/server";
 import { signBlob } from "@/lib/crypto";
 import { activeProvider, paymentsAvailable } from "@/lib/payments";
 import type { OrderTicket } from "@/lib/payments/types";
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
       receipt: `psk_${Date.now().toString(36)}`,
       notes: { sku: "kit", product: "photosizekaro_kit" },
     });
+    logServerEvent(req, "order_created", { sku: "kit", amt: order.amountPaise, mode: provider.mode });
     const ticket = signBlob({ oid: order.orderId, sku: "kit", amt: order.amountPaise, exp: Math.floor(Date.now() / 1000) + 3 * 3600 } satisfies OrderTicket, "ticket");
     return NextResponse.json({ ...order, ticket, sku: "kit", provider: provider.name, mode: provider.mode, ...provider.publicConfig() });
   } catch (e) {

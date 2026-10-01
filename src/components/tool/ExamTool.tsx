@@ -1,6 +1,7 @@
 "use client";
+import { track } from "@/lib/analytics/client";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { isResizable, PRESET_BY_ID, type DocSpec } from "@/data/presets";
 import { DocTool, type ToolSpec } from "./DocTool";
 
@@ -11,6 +12,9 @@ export function ExamTool({ presetId }: { presetId: string }) {
   const firstUsable = docs.find(isResizable) ?? docs[0];
   const [active, setActive] = useState(firstUsable.id);
   const doc = docs.find((d) => d.id === active) ?? docs[0];
+  useEffect(() => {
+    track("preset_select", { exam: presetId });
+  }, [presetId]);
   return (
     <div id="tool" className="scroll-mt-20">
       <div className="flex gap-2 overflow-x-auto pb-2" role="tablist" aria-label={`${p.name} documents`}>
@@ -31,7 +35,7 @@ export function ExamTool({ presetId }: { presetId: string }) {
       {/* keep every resizer mounted so switching tabs never loses work */}
       {docs.map((d) => (
         <div key={d.id} hidden={d.id !== doc.id}>
-          {isResizable(d) ? <DocTool spec={d as ToolSpec} fileName={d.fileName || `${p.id}-${d.id}`} examName={p.name} /> : <InfoCard d={d} />}
+          {isResizable(d) ? <DocTool spec={d as ToolSpec} fileName={d.fileName || `${p.id}-${d.id}`} examName={p.name} examId={p.id} /> : <InfoCard d={d} />}
         </div>
       ))}
     </div>
