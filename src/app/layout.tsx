@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     "Resize your photo, signature, thumb impression and declaration to the exact pixels and KB for SSC, UPSC, IBPS, SBI, RRB, NEET, JEE, CUET, GATE, CTET and state PSC forms. Free, in your browser — nothing is uploaded.",
   applicationName: BRAND,
   alternates: { canonical: "/" },
-  openGraph: { type: "website", siteName: BRAND, locale: "en_IN", url: "/" },
+  openGraph: { type: "website", siteName: BRAND, locale: "en_IN" },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
   formatDetection: { telephone: false },
