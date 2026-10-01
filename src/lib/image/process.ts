@@ -389,12 +389,12 @@ export function byteWindow(minKB: number | undefined, maxKB: number) {
 export async function encodeToKB(c: HTMLCanvasElement, opts: { minKB?: number; maxKB: number; dpi?: number }): Promise<EncodeResult> {
   const { lo, hi } = byteWindow(opts.minKB, opts.maxKB);
   const enc = async (q: number) => {
-    let b = new Uint8Array(await (await toBlob(c, q)).arrayBuffer());
+    let b: Uint8Array = new Uint8Array(await (await toBlob(c, q)).arrayBuffer());
     if (opts.dpi) b = setJpegDpi(b, opts.dpi);
     return b;
   };
   const QMAX = 0.97;
-  let best = await enc(QMAX);
+  let best: Uint8Array = await enc(QMAX);
   let quality = QMAX;
   if (best.length > hi) {
     let a = 0.05, z = QMAX;
@@ -424,5 +424,5 @@ export async function encodeToKB(c: HTMLCanvasElement, opts: { minKB?: number; m
     padded = best.length - before;
   }
   const size = jpegSize(best);
-  return { bytes: best, quality, padded, width: size?.width ?? c.width, height: size?.height ?? c.height, ok: best.length <= hi + 512 && best.length >= lo - 512 };
+  return { bytes: best, quality, padded, width: size?.width ?? c.width, height: size?.height ?? c.height, ok: best.length <= Math.floor(opts.maxKB * 1000) && best.length >= Math.ceil((opts.minKB ?? 0) * 1024) };
 }

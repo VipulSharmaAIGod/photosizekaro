@@ -39,6 +39,8 @@ export interface DocSpec {
   kbNote?: string;
   /** Download file name without extension (some portals require e.g. "photo"). */
   fileName?: string;
+  /** Set when the content differs from the common photo/signature (e.g. triple signature) — skipped by the batch kit. */
+  kitSkip?: string;
   /** Background hint used for defaults: white = whiten by default, keep = never whiten automatically. */
   background?: "white" | "light" | "keep";
   /** Ink cleanup (signature/thumb/declaration): convert to clean white paper. */
@@ -225,6 +227,7 @@ const upscDocs: DocSpec[] = [
     minKB: 20,
     maxKB: 100,
     fileName: "signature",
+    kitSkip: "needs three signatures in one image",
     background: "white",
     cleanup: true,
     notes: [
@@ -755,6 +758,7 @@ export const PRESETS: ExamPreset[] = [
         id: "signature-hi",
         kind: "signature",
         label: "Signature in Hindi",
+        kitSkip: "needs your Hindi signature",
         labelHi: "हिंदी में हस्ताक्षर",
         uploaded: true,
         width: 200,
