@@ -71,4 +71,4 @@ Outputs go to `test-output/`, screenshots to `screenshots/`.
 
 ### Keep-alive
 
-Cold starts are reduced by the keep-alive workflow in the public **VipulSharmaAIGod/biodatakaro** repo (`.github/workflows/keepalive.yml`). It pings this site's `/api/health` every 10 minutes from 18:00 to 22:00 IST, which fits within Render's shared 750 free hours.
+Cold starts are reduced by an **in-app self-ping**: `src/instrumentation.ts` → `src/lib/keepalive.ts`. While an instance is up on Render, it pings `/api/health` every 9 minutes for each site inside its IST window: BiodataKaro 10:00–22:00 and this site 18:00–22:00. BiodataKaro carries the same list, so the two sites keep each other warm, and BiodataKaro wakes this one at 18:00. The wake-up backups are the agent-box pinger (`/workspace/analytics/keepalive/keepalive.sh`) and the GitHub workflow in **VipulSharmaAIGod/biodatakaro**. GitHub's schedule is unreliable, so that workflow is only a backup. The total stays at about 512 h of Render's shared 750 free hours. `KEEPALIVE=off` disables the self-ping and `KEEPALIVE_TARGETS` overrides the list. Tests: `npm run test:keepalive`.
